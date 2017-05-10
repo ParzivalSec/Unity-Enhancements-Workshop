@@ -1,0 +1,29 @@
+body {
+	font-family:"Calibri";
+	padding-top: 0;
+	margin-top: 0;
+}
+
+p {
+	font-family:"Calibri";
+	padding:4px;
+	border-radius:5px;
+	margin:2px;
+	display:block;
+}
+
+.system {
+	background-color: red;
+}
+
+.networking {
+	background-color: green;
+}
+
+.gameplay {
+	background-color: blue;
+}
+
+.statistics {
+	background-color: brown;
+}
