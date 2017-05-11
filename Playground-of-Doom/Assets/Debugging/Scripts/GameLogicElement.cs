@@ -8,10 +8,11 @@ public class GameLogicElement : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        m_logger = new HTMLLogger("log.html");
 
-        m_logger.Info(LogCategory.SYSTEM, "Out of Memory!");
-        m_logger.Info(LogCategory.NETWORKING, "DB connection lost");
+        // Get a stack-trace in .NET without a thrown excpetion - be careful, this operation is slow !
+        // Don't use for stuff that get logged every frame !!!
+        System.Diagnostics.StackTrace t = new System.Diagnostics.StackTrace(true);
+        HTMLLogger.Instance.Log(LogCategory.GAMEPLAY, "GameLogicElement started up!", t.ToString());
     }
 	
 	// Update is called once per frame

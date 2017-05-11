@@ -30,6 +30,7 @@ public class FPSCounter : MonoBehaviour
     void Start()
     {
         StartCoroutine(FPS());
+        HTMLLogger.Instance.Log(LogCategory.STATISTICS, "FPSCounter started CoRoutine", "");
     }
 
     void Update()

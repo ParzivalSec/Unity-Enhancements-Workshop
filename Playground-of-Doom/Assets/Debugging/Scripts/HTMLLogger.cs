@@ -1,43 +1,83 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.ComponentModel;
+using System;
 
+/**
+ * A list of available categories to log messages to
+ * In a retail project we would read that from a config file
+ *
+ **/
 public enum LogCategory
 {
     GAMEPLAY,
     SYSTEM,
     NETWORKING,
     STATISTICS,
+    ERROR,
+    AUDIO,
+    AI,
+    WARNING,
+    PHYSICS,
+    GUI,
+    INPUT
 }
 
-public class HTMLLogger : MonoBehaviour
+public sealed class HTMLLogger
 {
+    private string logFileDir = "C:\\LOGFILES_DOOM\\";
     private string m_logFile = "";
+    private int traceCount = 0;
+    private DateTime logFileDate;
 
-    public HTMLLogger(string logFile) {
-        m_logFile = Application.dataPath + "/" + logFile;
-        Debug.Log(m_logFile);
-        WriteHTMLHeader();
-    }
+    private static readonly HTMLLogger instance = new HTMLLogger();
 
-    public void Info(LogCategory category, string msg) {
-        using (StreamWriter outputFile = new StreamWriter(m_logFile, true))
+    public static HTMLLogger Instance
+    {
+        get
         {
-            string logContainer = "<p class=" + category.ToString().ToLower() + "> " + msg + "</p>";
-
-            outputFile.Write(logContainer);
+            return instance;
         }
     }
 
-    public void Warning(LogCategory category, string msg) {
+    public HTMLLogger()
+    {
+        logFileDate = DateTime.Now;
+        m_logFile = logFileDir + logFileDate.ToString("yyyy-dd-MMMM_hh_mm") + "_log.html";
+        WriteHTMLSkeleton();
+        WriteButtonHeader();
     }
 
-    public void Error(LogCategory category, string msg) {
+    public void Log(LogCategory category, string msg, string stackTrace)
+    {
+        // We use rotating log files to ensure one does not grow too big
+        // Could also add a check for logfile size and more to be safe
+        if (DateTime.Now >= logFileDate.AddHours(5)) {
+            m_logFile = logFileDir + logFileDate.ToString("yyyy-dd-MMMM_hh-mm") + "_log.html";
+        }
+
+        string traceID = "trace" + traceCount;
+        using (StreamWriter outputFile = new StreamWriter(m_logFile, true))
+        {
+            string logContainer = "<p class='{category}'> <span class='time'> {time} </span> <a onClick='hide(\"{traceID}\")'> STACK </a> {msg} </p>";
+            logContainer = logContainer.Replace("{category}", category.ToString().ToLower());
+            logContainer = logContainer.Replace("{time}", DateTime.Now.ToString());
+            logContainer = logContainer.Replace("{traceID}", traceID);
+            logContainer = logContainer.Replace("{msg}", msg);
+
+            outputFile.WriteLine(logContainer);
+
+            string stackTraceContainer = "<pre id='{traceID}'> {stackTrace} </pre>";
+            stackTraceContainer = stackTraceContainer.Replace("{traceID}", traceID).Replace("{stackTrace}", stackTrace);
+
+            outputFile.WriteLine(stackTraceContainer);
+        }
+
+        traceCount++;
     }
 
-    private void WriteHTMLHeader() {
+    private void WriteHTMLSkeleton()
+    {
         // Write the string array to a new file named "WriteLines.txt".
         using (StreamWriter outputFile = new StreamWriter(m_logFile))
         {
@@ -49,7 +89,25 @@ public class HTMLLogger : MonoBehaviour
                     "</head>" +
                     "<body>";
 
-            outputFile.Write(htmlHeader);
+            outputFile.WriteLine(htmlHeader);
+        }
+    }
+
+    private void WriteButtonHeader()
+    {
+        using (StreamWriter outputFile = new StreamWriter(m_logFile, true))
+        {
+            outputFile.WriteLine("<div class='Header'>");
+            foreach (string category in Enum.GetNames(typeof(LogCategory)))
+            {
+                // In higher .NET versions (> 4.0) we could use string interpolation to replace the template parameters
+                string button = "<input type='button' value='{category}' class='{category} Button' onClick='hide_class(\"{category}\")'>";
+                button = button.Replace("{category}", category.ToLower());
+                outputFile.WriteLine(button);
+            }
+            outputFile.WriteLine("</div>");
+            outputFile.WriteLine("<h1> Playground of Doom - Logs - " + logFileDate.ToString() + " </h1>");
+            outputFile.WriteLine("<p> Use the buttons above to toggle log categories. Expand stack-trace via Stack button </p>");
         }
     }
 }
