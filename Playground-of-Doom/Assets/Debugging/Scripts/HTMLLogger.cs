@@ -23,6 +23,11 @@ public enum LogCategory
     INPUT
 }
 
+/**
+ * Currently HTMLLogger is a singleton, in a retail project I would recommend using
+ * a registry where loggers can attach instead of static global state
+ **/
+
 public sealed class HTMLLogger
 {
     private string logFileDir = "C:\\LOGFILES_DOOM\\";
@@ -30,6 +35,7 @@ public sealed class HTMLLogger
     private int traceCount = 0;
     private DateTime logFileDate;
 
+    // Singleton part - create a static instance and pass it on when requested
     private static readonly HTMLLogger instance = new HTMLLogger();
 
     public static HTMLLogger Instance
@@ -56,6 +62,8 @@ public sealed class HTMLLogger
             m_logFile = logFileDir + logFileDate.ToString("yyyy-dd-MMMM_hh-mm") + "_log.html";
         }
 
+        // If Log() is called, write a new html element to the logfile containing
+        // the log-message, maybe a stacktrace and the log category
         string traceID = "trace" + traceCount;
         using (StreamWriter outputFile = new StreamWriter(m_logFile, true))
         {
@@ -93,6 +101,8 @@ public sealed class HTMLLogger
         }
     }
 
+    // This method creates the header row that contains the buttons to toggle
+    // different log categories
     private void WriteButtonHeader()
     {
         using (StreamWriter outputFile = new StreamWriter(m_logFile, true))

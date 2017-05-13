@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Layer/layer.unity
+- path: Assets/PoolManager/poolmanager.unity
   isLoaded: 1
   isActive: 1
