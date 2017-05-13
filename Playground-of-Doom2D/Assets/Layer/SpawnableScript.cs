@@ -5,6 +5,7 @@ using UnityEngine;
 public class SpawnableScript : MonoBehaviour {
 
     public bool log = false;
+    // TTL means time to live -> a counter after which the object destroys itself.
     public bool useTTL = false;
     float ttl = 3.0f;
 

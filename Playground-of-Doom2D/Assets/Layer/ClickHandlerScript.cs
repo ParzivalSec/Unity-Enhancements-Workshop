@@ -28,12 +28,14 @@ public class ClickHandlerScript : MonoBehaviour {
         }
     }
    
+    // A raycast for calculating the screen position of a click. In 2D, the raycast distance is actually redundant in Unity.
     Vector3 CastRayToWorld()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         return ray.origin + (ray.direction * raycastDistance);
     }
     
+    // Spawns objects in a circle exploding outwards like fireworks. Yay!
     void SpawnBasicFireworks(Vector3 point)
     {
         float step = 360.0f / particleCount;
@@ -46,11 +48,13 @@ public class ClickHandlerScript : MonoBehaviour {
         }
     }
 
+    // Spawns objects which get randomly assigned colors and layers for filtering them.
     void SpawnColorLiquid(Vector3 point)
     {
         GameObject obj = (GameObject)Instantiate(spawnableColor, point, Quaternion.Euler(0.0f, 0.0f, 0.0f));
         Color color = Color.black;
         int rand = Random.Range(0, 3);
+        // Color and layer are assigned randomly. NameToLayer lets us use the layer name instead of its ID!
         switch(rand)
         {
             case 0:

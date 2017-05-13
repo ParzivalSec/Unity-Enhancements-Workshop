@@ -43,9 +43,10 @@ public class Character : MonoBehaviour {
         {
             force += Vector2.up * 30;
         }
-        // Take delta time into the equation! This way 
+        // Take delta time into the equation! This way it runs independently from framerate.
         force *= Time.deltaTime * speed;
         rigidBody.AddForce(force);
+        // Limit the speed to a maximum.
         if (rigidBody.velocity.magnitude > maxSpeed)
         {
             rigidBody.velocity = rigidBody.velocity.normalized * maxSpeed;
